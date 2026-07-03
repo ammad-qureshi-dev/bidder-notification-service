@@ -5,6 +5,6 @@ server:
   port: 8081
 
 cookies:
-  secure: false
-  sameSite: Lax
-  httpOnly: false
+  secure: true
+  sameSite: None
+  httpOnly: true

@@ -10,8 +10,4 @@ public class Constants {
         public static final String BASE_URI = "/api";
         public static final String V1 = "/v1";
     }
-
-    public static class Database {
-        public static final String SCHEMA = "bidder";
-    }
 }

@@ -3,7 +3,7 @@ package models.entities;
 import models.ContactType;
 import models.NotificationStatus;
 import models.NotificationType;
-import com.bidder.notification_service.utils.Constants;
+import models.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

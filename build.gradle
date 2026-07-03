@@ -1,11 +1,11 @@
 plugins {
-	id 'java'
+	id 'java-library'
 	id 'org.springframework.boot' version '4.0.7'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.bidder'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 
 java {
 	toolchain {
@@ -13,11 +13,19 @@ java {
 	}
 }
 
+// Spring Boot plugin disables the plain `jar` task by default; re-enable it
+// so `maven-publish`'s components.java has classes to publish.
+jar {
+	enabled = true
+}
+
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	api project(':notifications-model')
+
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
