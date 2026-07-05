@@ -16,7 +16,7 @@ public class NotificationMapper {
 		return Notification.builder().type(NotificationConfig.getConfiguredType(request.template()))
 				.template(request.template()).recipientId(request.recipientId()).status(NotificationStatus.SENT)
 				.subject(NotificationConfig.getConfiguredSubject(request.template())).contactType(contactType)
-				.recipientContact(recipientContact).build();
+				.recipientContact(recipientContact).templateData(request.templateData()).build();
 	}
 
 	public static NotificationResponseDto entityToResponse(Notification n) {

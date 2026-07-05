@@ -17,7 +17,7 @@ public record SendNotificationRequest(
 
 		Map<ContactType, String> recipientConfig,
 
-		Object templateData) {
+		Map<String, Object> templateData) {
 }
 
 /*
