@@ -2,6 +2,7 @@ plugins {
 	id 'java-library'
 	id 'org.springframework.boot' version '4.0.7'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '6.19.0'
 }
 
 group = 'com.bidder'
@@ -17,6 +18,17 @@ java {
 // so `maven-publish`'s components.java has classes to publish.
 jar {
 	enabled = true
+}
+
+spotless {
+	java {
+		target 'src/**/*.java'
+		importOrder('java', 'javax', 'com.acme', '', '\\#com.acme', '\\#')
+		removeUnusedImports()
+		eclipse()   // eclipse, prettier, googleJavaFormat
+		formatAnnotations()
+		licenseHeader '/* (C) $YEAR \nbidder.app */'
+	}
 }
 
 repositories {

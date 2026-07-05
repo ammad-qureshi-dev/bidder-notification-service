@@ -1,16 +1,16 @@
+/* (C) 2026 
+bidder.app */
 package models.entities;
 
-import models.*;
+import java.util.Map;
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import models.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.validator.constraints.Length;
-
-import java.sql.SQLType;
-import java.util.Map;
-import java.util.UUID;
 
 @Setter
 @Getter
@@ -22,31 +22,32 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class Notification extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @NotNull
-    // Email / Phone-number
-    private String recipientContact;
+	@NotNull
+	// Email / Phone-number
+	private String recipientContact;
 
-    @NotNull
-    private UUID recipientId;
+	@NotNull private UUID recipientId;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private TemplateName templateName;
+	@NotNull @Enumerated(EnumType.STRING)
+	private NotificationSubject subject;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> templateData;
+	@NotNull @Enumerated(EnumType.STRING)
+	private TemplateName templateName;
 
-    @Enumerated(EnumType.STRING)
-    private ContactType contactType;
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(columnDefinition = "jsonb")
+	private Map<String, Object> templateData;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
+	@Enumerated(EnumType.STRING)
+	private ContactType contactType;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationStatus status;
+	@Enumerated(EnumType.STRING)
+	private NotificationType type;
+
+	@Enumerated(EnumType.STRING)
+	private NotificationStatus status;
 }

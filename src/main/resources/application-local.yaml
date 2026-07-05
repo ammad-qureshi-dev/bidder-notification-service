@@ -1,6 +1,25 @@
 spring:
   application:
     name: notification-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/postgres?prepareThreshold=0
+    username: ${DB_USER}
+    password: ${DB_PWD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      # This clears any cached prepared statements before reusing the connection.
+      connection-init-sql: "DISCARD ALL"
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   mail:
     port: 587
     host: 'smtp.gmail.com'
@@ -25,3 +44,8 @@ cookies:
   secure: true
   sameSite: None
   httpOnly: true
+
+logging:
+  level:
+    root: info
+    com.bidder.notification_service: info

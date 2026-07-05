@@ -1,13 +1,11 @@
+/* (C) 2026 
+bidder.app */
 package models.dtos.response;
+
+import java.util.UUID;
 
 import models.ContactType;
 import models.NotificationStatus;
 
-import java.util.UUID;
-
-public record SendNotificationResponse(
-        NotificationStatus status,
-        ContactType sentVia,
-        UUID recipientId
-) {
+public record SendNotificationResponse(NotificationStatus status, ContactType sentVia, UUID recipientId) {
 }
