@@ -2,6 +2,7 @@
 bidder.app */
 package models.dtos.request;
 
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
@@ -12,14 +13,20 @@ public record SendNotificationRequest(
 		// AppUserId
 		@NotNull UUID recipientId,
 
-		@NotNull ContactType contactType,
+		@NotNull TemplateName template,
 
-		// Email / Phone
-		@NotNull String recipientContact,
+		Map<ContactType, String> recipientConfig,
 
-		// This helps identify which template to send
-		@NotNull TemplateName templateName,
-
-		// Template data (if needed)
-		@NotNull Object templateData) {
+		Object templateData) {
 }
+
+/*
+ * Sample Payload: { "recipientId": "93f93825-75e5-4fc0-bb5a-3ee309361294",
+ * 
+ * "template": "WELCOME_REGISTRATION",
+ * 
+ * "recipientConfig": { "MOBILE": "+1 647-870-1917", "EMAIL":
+ * "ammadq3@gmail.com" },
+ * 
+ * "templateData": { "fullName": "loser" } }
+ */

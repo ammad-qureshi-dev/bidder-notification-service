@@ -36,6 +36,7 @@ public class EmailService implements Notifier {
 	private final JavaMailSender emailSender;
 	private final AppNotificationService appNotificationService;
 
+	private static final String EMAIL_TEMPLATE_PREFIX = "email/";
 	private static final String DATA_MODEL_NAME = "data";
 	private static final int RETRY_LIMIT = 3;
 
@@ -43,7 +44,7 @@ public class EmailService implements Notifier {
 	public SendNotificationResponse send(SendNotificationRequest request) {
 		int tries = 0;
 
-		var email = request.recipientContact();
+		var email = request.recipientConfig().get(ContactType.EMAIL);
 		if (!StringUtils.hasLength(email)) {
 			throw new IllegalStateException("Email cannot be sent, no email provided");
 		}
@@ -52,7 +53,7 @@ public class EmailService implements Notifier {
 			try {
 				tries++;
 				emailSender.send(generateHtmlMessage(request));
-				appNotificationService.send(request);
+				appNotificationService.logNotification(request, ContactType.EMAIL, email);
 				log.info("Email sent to {}", request.recipientId());
 				break;
 			} catch (RuntimeException | IOException | TemplateException | MessagingException e) {
@@ -70,18 +71,18 @@ public class EmailService implements Notifier {
 
 	private MimeMessage generateHtmlMessage(SendNotificationRequest request)
 			throws IOException, TemplateException, MessagingException {
-		Template template = freeMarkerConfig.getTemplate(request.templateName().getPath());
-		log.debug("Template {} found", request.templateName());
+		Template template = freeMarkerConfig.getTemplate(EMAIL_TEMPLATE_PREFIX + request.template().getPath());
+		log.debug("Template {} found", request.template());
 		StringWriter writer = new StringWriter();
 
 		template.process(Map.of(DATA_MODEL_NAME, request.templateData()), writer);
-		log.debug("Data set for {} template", request.templateName());
+		log.debug("Data set for {} template", request.template());
 
 		MimeMessage mimeMessage = emailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
-		helper.setTo(request.recipientContact());
-		helper.setSubject(NotificationConfig.getConfiguredSubject(request.templateName()).getSubject());
-		helper.setText(writer.toString(), ContactType.EMAIL.equals(request.contactType()));
+		helper.setTo(request.recipientConfig().get(ContactType.EMAIL));
+		helper.setSubject(NotificationConfig.getConfiguredSubject(request.template()).getSubject());
+		helper.setText(writer.toString(), request.recipientConfig().containsKey(ContactType.EMAIL));
 		helper.setFrom(emailFrom);
 
 		return mimeMessage;

@@ -3,10 +3,7 @@ bidder.app */
 package com.bidder.notification_service.services;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import javax.naming.directory.NoSuchAttributeException;
 
@@ -36,22 +33,23 @@ public class NotificationService {
 
 	private final NotificationRepository notificationRepository;
 
-	public SendNotificationResponse send(@Valid SendNotificationRequest request)
+	public List<SendNotificationResponse> send(@Valid SendNotificationRequest request)
 			throws NoSuchAttributeException, TemplateException, MessagingException, IOException {
-		var contactType = request.contactType();
 
-		switch (contactType) {
-			case EMAIL -> {
-				return emailService.send(request);
+		var sentResponses = new ArrayList<SendNotificationResponse>();
+		var contactTypes = request.recipientConfig().keySet();
+
+		for (var contactType : contactTypes) {
+			switch (contactType) {
+				case EMAIL -> sentResponses.add(emailService.send(request));
+				case PHONE -> sentResponses.add(mobileService.send(request));
+				default -> throw new NoSuchAttributeException("Contact Type does not exist");
 			}
-			case PHONE -> {
-				return mobileService.send(request);
-			}
-			case APP -> {
-				return appNotificationService.send(request);
-			}
-			default -> throw new NoSuchAttributeException("Contact Type does not exist");
 		}
+
+		sentResponses.add(appNotificationService.send(request));
+
+		return sentResponses;
 	}
 
 	public List<NotificationResponseDto> getNotifications(ContactType contactType, UUID recipientId) {

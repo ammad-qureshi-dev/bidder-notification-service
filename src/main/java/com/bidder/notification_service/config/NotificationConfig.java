@@ -15,13 +15,13 @@ import static models.NotificationSubject.VERIFY_ACCOUNT;
 import static models.NotificationSubject.WELCOME_TO_BIDDER;
 import static models.NotificationType.ACTION_REQUIRED;
 import static models.NotificationType.INFO;
-import static models.TemplateName.ACCOUNT_VERIFICATION_EMAIL;
-import static models.TemplateName.WELCOME_REGISTRATION_EMAIL;
+import static models.TemplateName.ACCOUNT_VERIFICATION;
+import static models.TemplateName.WELCOME_REGISTRATION;
 
 @Component
 public class NotificationConfig {
 	private static final Map<TemplateName, Pair<NotificationType, NotificationSubject>> TEMPLATE_AND_TYPE = Map.of(
-			WELCOME_REGISTRATION_EMAIL, Pair.of(INFO, WELCOME_TO_BIDDER), ACCOUNT_VERIFICATION_EMAIL,
+			WELCOME_REGISTRATION, Pair.of(INFO, WELCOME_TO_BIDDER), ACCOUNT_VERIFICATION,
 			Pair.of(ACTION_REQUIRED, VERIFY_ACCOUNT));
 
 	public static NotificationType getConfiguredType(TemplateName templateName) {

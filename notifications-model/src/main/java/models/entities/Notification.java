@@ -36,7 +36,7 @@ public class Notification extends BaseEntity {
 	private NotificationSubject subject;
 
 	@NotNull @Enumerated(EnumType.STRING)
-	private TemplateName templateName;
+	private TemplateName template;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(columnDefinition = "jsonb")
