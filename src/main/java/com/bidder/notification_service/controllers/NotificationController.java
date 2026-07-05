@@ -13,6 +13,7 @@ import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import models.ContactType;
+import models.NotificationStatus;
 import models.dtos.request.SendNotificationRequest;
 import models.dtos.response.NotificationResponseDto;
 import models.dtos.response.SendNotificationResponse;
@@ -34,13 +35,7 @@ public class NotificationController {
 		try {
 			var response = notificationService.send(request);
 			return ResponseEntity.ok().body(response);
-		} catch (NoSuchAttributeException e) {
-			throw new RuntimeException(e);
-		} catch (TemplateException e) {
-			throw new RuntimeException(e);
-		} catch (MessagingException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
+		} catch (RuntimeException | NoSuchAttributeException | TemplateException | MessagingException | IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -50,5 +45,13 @@ public class NotificationController {
 			@RequestParam(value = "contactType", required = false) ContactType contactType,
 			@PathVariable UUID recipientId) {
 		return ResponseEntity.ok().body(notificationService.getNotifications(contactType, recipientId));
+	}
+
+	@PutMapping("/{notificationId}")
+	public ResponseEntity<UUID> updateNotificationStatus(
+			@RequestParam(value = "status", required = true) NotificationStatus status,
+			@PathVariable UUID notificationId) {
+		notificationService.updateNotificationStatus(status, notificationId);
+		return ResponseEntity.ok().body(notificationId);
 	}
 }

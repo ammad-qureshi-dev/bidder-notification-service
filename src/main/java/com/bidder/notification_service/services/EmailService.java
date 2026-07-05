@@ -27,19 +27,20 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailService implements Notifier {
 
 	@Value("${MAIL_USERNAME}")
 	private String emailFrom;
 
 	private final Configuration freeMarkerConfig;
 	private final JavaMailSender emailSender;
+	private final AppNotificationService appNotificationService;
 
 	private static final String DATA_MODEL_NAME = "data";
 	private static final int RETRY_LIMIT = 3;
 
-	public SendNotificationResponse sendEmail(SendNotificationRequest request)
-			throws TemplateException, MessagingException, IOException {
+	@Override
+	public SendNotificationResponse send(SendNotificationRequest request) {
 		int tries = 0;
 
 		var email = request.recipientContact();
@@ -51,6 +52,7 @@ public class EmailService {
 			try {
 				tries++;
 				emailSender.send(generateHtmlMessage(request));
+				appNotificationService.send(request);
 				log.info("Email sent to {}", request.recipientId());
 				break;
 			} catch (RuntimeException | IOException | TemplateException | MessagingException e) {
@@ -58,7 +60,7 @@ public class EmailService {
 
 				if (tries >= RETRY_LIMIT) {
 					log.error("Failed to send email, retries exceeded", e);
-					throw e;
+					throw new RuntimeException();
 				}
 			}
 		}
@@ -69,11 +71,11 @@ public class EmailService {
 	private MimeMessage generateHtmlMessage(SendNotificationRequest request)
 			throws IOException, TemplateException, MessagingException {
 		Template template = freeMarkerConfig.getTemplate(request.templateName().getPath());
-        log.debug("Template {} found", request.templateName());
+		log.debug("Template {} found", request.templateName());
 		StringWriter writer = new StringWriter();
 
 		template.process(Map.of(DATA_MODEL_NAME, request.templateData()), writer);
-        log.debug("Data set for {} template", request.templateName());
+		log.debug("Data set for {} template", request.templateName());
 
 		MimeMessage mimeMessage = emailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");

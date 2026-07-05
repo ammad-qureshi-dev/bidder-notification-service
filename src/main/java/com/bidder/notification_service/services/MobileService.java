@@ -8,9 +8,10 @@ import models.dtos.response.SendNotificationResponse;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MobileService {
+public class MobileService implements Notifier {
 
-	public SendNotificationResponse sendSms(@Valid SendNotificationRequest request) {
+	@Override
+	public SendNotificationResponse send(@Valid SendNotificationRequest request) {
 		throw new RuntimeException("Not yet implemented");
 	}
 }
