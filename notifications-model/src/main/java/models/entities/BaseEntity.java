@@ -1,3 +1,5 @@
+/* (C) 2026 
+bidder.app */
 package models.entities;
 
 import jakarta.persistence.MappedSuperclass;
@@ -15,9 +17,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public class BaseEntity {
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
 }

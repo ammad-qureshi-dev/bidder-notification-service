@@ -1,14 +1,15 @@
 package models.entities;
 
-import models.ContactType;
-import models.NotificationStatus;
-import models.NotificationType;
-import models.Constants;
+import models.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.validator.constraints.Length;
 
+import java.sql.SQLType;
+import java.util.Map;
 import java.util.UUID;
 
 @Setter
@@ -32,9 +33,13 @@ public class Notification extends BaseEntity {
     @NotNull
     private UUID recipientId;
 
-    @NotNull @Length(max = 64) private String title;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TemplateName templateName;
 
-    @Length(max = 256) private String content;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> templateData;
 
     @Enumerated(EnumType.STRING)
     private ContactType contactType;

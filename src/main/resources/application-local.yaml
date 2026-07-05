@@ -1,6 +1,23 @@
 spring:
   application:
     name: notification-service
+  mail:
+    port: 587
+    host: 'smtp.gmail.com'
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PWD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: false
+        transport:
+          protocol: 'smtp'
+  output:
+    ansi:
+      enabled: ALWAYS
 server:
   port: 8081
 
