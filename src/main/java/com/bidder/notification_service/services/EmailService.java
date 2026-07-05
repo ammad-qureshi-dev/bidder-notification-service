@@ -53,6 +53,8 @@ public class EmailService implements Notifier {
 			try {
 				tries++;
 				emailSender.send(generateHtmlMessage(request));
+
+				// ToDo: bug -- if logging fails, handle differently
 				appNotificationService.logNotification(request, ContactType.EMAIL, email);
 				log.info("Email sent to {}", request.recipientId());
 				break;
