@@ -43,7 +43,8 @@ public class NotificationService {
 			switch (contactType) {
 				case EMAIL -> sentResponses.add(emailService.send(request));
 				case PHONE -> sentResponses.add(mobileService.send(request));
-				case APP -> { /* handled unconditionally below, not per-contact-type */ }
+				case APP -> {
+					/* handled unconditionally below, not per-contact-type */ }
 			}
 		}
 

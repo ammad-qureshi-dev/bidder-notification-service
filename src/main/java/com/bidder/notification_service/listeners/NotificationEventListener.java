@@ -1,4 +1,4 @@
-/* (C) 2026
+/* (C) 2026 
 bidder.app */
 package com.bidder.notification_service.listeners;
 
@@ -16,15 +16,15 @@ import static com.bidder.notification_service.utils.Constants.NOTIFICATION_TOPIC
 @RequiredArgsConstructor
 public class NotificationEventListener {
 
-    private final NotificationService notificationService;
+	private final NotificationService notificationService;
 
-    @KafkaListener(topics = NOTIFICATION_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
-    public void onNotificationEvent(SendNotificationRequest request) {
-        try {
-            log.info("consuming request");
-            notificationService.send(request);
-        } catch (Exception e) {
-            log.error("Failed to process notification event for recipient {}", request.recipientId(), e);
-        }
-    }
+	@KafkaListener(topics = NOTIFICATION_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
+	public void onNotificationEvent(SendNotificationRequest request) {
+		try {
+			log.info("consuming request");
+			notificationService.send(request);
+		} catch (Exception e) {
+			log.error("Failed to process notification event for recipient {}", request.recipientId(), e);
+		}
+	}
 }

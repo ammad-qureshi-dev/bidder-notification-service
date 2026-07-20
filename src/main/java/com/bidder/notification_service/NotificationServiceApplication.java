@@ -23,9 +23,6 @@ public class NotificationServiceApplication {
 
 	@Bean
 	NewTopic notification() {
-		return TopicBuilder.name(NOTIFICATION_TOPIC)
-				.partitions(1)
-				.replicas(1)
-				.build();
+		return TopicBuilder.name(NOTIFICATION_TOPIC).partitions(1).replicas(1).build();
 	}
 }
