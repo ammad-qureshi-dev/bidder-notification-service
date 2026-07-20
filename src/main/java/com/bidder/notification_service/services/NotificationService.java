@@ -43,7 +43,7 @@ public class NotificationService {
 			switch (contactType) {
 				case EMAIL -> sentResponses.add(emailService.send(request));
 				case PHONE -> sentResponses.add(mobileService.send(request));
-				default -> throw new NoSuchAttributeException("Contact Type does not exist");
+				case APP -> { /* handled unconditionally below, not per-contact-type */ }
 			}
 		}
 
