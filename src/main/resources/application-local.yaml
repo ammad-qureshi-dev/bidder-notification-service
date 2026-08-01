@@ -50,12 +50,14 @@ spring:
 server:
   port: 8081
 
-cookies:
-  secure: true
-  sameSite: None
-  httpOnly: true
-
 logging:
   level:
     root: info
     com.bidder.notification_service: info
+
+bidder-internal-services:
+  identity-and-auth-service: http://localhost:8080/api
+
+identity-and-auth-service:
+  get-preferred-contact: /v1/identity-and-auth/app-user/contacts/preferred-contact-method
+  get-contact-methods: /v1/identity-and-auth/app-user/contacts

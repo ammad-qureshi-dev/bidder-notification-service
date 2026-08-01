@@ -19,6 +19,7 @@ import models.dtos.response.NotificationResponseDto;
 import models.dtos.response.SendNotificationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import response.ApiResponse;
 
 import static com.bidder.notification_service.utils.Constants.Controller.BASE_URI;
 import static com.bidder.notification_service.utils.Constants.Controller.V1;
@@ -31,28 +32,30 @@ public class NotificationController {
 	private final NotificationService notificationService;
 
 	@PostMapping("/send")
-	public ResponseEntity<List<SendNotificationResponse>> sendNotification(
+	public ResponseEntity<ApiResponse<List<SendNotificationResponse>>> sendNotification(
 			@RequestBody SendNotificationRequest request) {
 		try {
 			var response = notificationService.send(request);
-			return ResponseEntity.ok().body(response);
+			return ResponseEntity.ok()
+					.body(ApiResponse.<List<SendNotificationResponse>>builder().data(response).build());
 		} catch (RuntimeException | NoSuchAttributeException | TemplateException | MessagingException | IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@GetMapping("/recipient/{recipientId}")
-	public ResponseEntity<List<NotificationResponseDto>> getNotifications(
+	public ResponseEntity<ApiResponse<List<NotificationResponseDto>>> getNotifications(
 			@RequestParam(value = "contactType", required = false) ContactType contactType,
 			@PathVariable UUID recipientId) {
-		return ResponseEntity.ok().body(notificationService.getNotifications(contactType, recipientId));
+		return ResponseEntity.ok().body(ApiResponse.<List<NotificationResponseDto>>builder()
+				.data(notificationService.getNotifications(contactType, recipientId)).build());
 	}
 
 	@PutMapping("/{notificationId}")
-	public ResponseEntity<UUID> updateNotificationStatus(
+	public ResponseEntity<ApiResponse<UUID>> updateNotificationStatus(
 			@RequestParam(value = "status", required = true) NotificationStatus status,
 			@PathVariable UUID notificationId) {
 		notificationService.updateNotificationStatus(status, notificationId);
-		return ResponseEntity.ok().body(notificationId);
+		return ResponseEntity.ok().body(ApiResponse.<UUID>builder().data(notificationId).build());
 	}
 }

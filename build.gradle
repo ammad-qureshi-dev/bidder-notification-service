@@ -33,6 +33,14 @@ spotless {
 
 repositories {
 	mavenCentral()
+	maven {
+		name = 'GitHubPackages'
+		url = uri('https://maven.pkg.github.com/ammad-qureshi-dev/bidder-common')
+		credentials {
+			username = System.getenv('BIDDER_USERNAME')
+			password = System.getenv('BIDDER_GITHUB_TOKEN')
+		}
+	}
 }
 
 dependencies {
@@ -47,6 +55,7 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-restclient'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -64,6 +73,8 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	implementation 'com.bidder:common-model:0.0.3-SNAPSHOT'
 }
 
 tasks.named('test') {

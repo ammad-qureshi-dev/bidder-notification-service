@@ -25,7 +25,7 @@
                         </p>
                         <p style="margin:0 0 24px 0; font-size:16px; color:#4b5563; line-height:1.6;">
                             We received a request to reset your <strong>Bidder</strong> password. Click the button
-                            below to choose a new one. This link expires in ${data.expiryMinutes!'30'} minutes.
+                            below to create a new one. This link expires in ${data.expiryMinutes!'30'} minutes.
                         </p>
                     </td>
                 </tr>

@@ -13,5 +13,10 @@ public class Constants {
 		public static final String V1 = "/v1";
 	}
 
+	@AllArgsConstructor
+	public static class Database {
+		public static final String SCHEMA = "notifications_service";
+	}
+
 	public static final String NOTIFICATION_TOPIC = "notification";
 }

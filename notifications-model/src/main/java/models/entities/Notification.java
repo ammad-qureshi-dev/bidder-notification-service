@@ -18,7 +18,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(schema = Constants.Database.SCHEMA, name = "notification")
+@Table(schema = "notifications_service", name = "notification")
 @EqualsAndHashCode(callSuper = true)
 public class Notification extends BaseEntity {
 
