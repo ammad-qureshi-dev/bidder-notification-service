@@ -13,7 +13,10 @@ public enum NotificationSubject {
 									"Your bid was accepted"), BID_REQUEST_REJECTED(
 											"Update on your bid"), BID_REQUEST_UPDATED(
 													"Your bid has been updated"), BID_REQUEST_SENT(
-															"Bid placed successfully");
+															"Bid placed successfully"), AUCTION_CLOSED(
+																	"Your auction has closed"), AUCTION_LIVE(
+																			"Your auction is now live"), AUCTION_PAUSED(
+																					"Your auction has been paused");
 
 	private final String subject;
 

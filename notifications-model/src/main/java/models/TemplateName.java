@@ -11,9 +11,12 @@ public enum TemplateName {
 					"/account_verified.ftl"), BID_REQUEST_ACCEPTED("/bid_request_accepted.ftl"), BID_REQUEST_REJECTED(
 							"/bid_request_rejected.ftl"), BID_REQUEST_UPDATED(
 									"/bid_request_updated.ftl"), BID_REQUEST_SENT(
-											"/bid_request_sent.ftl"), WELCOME_REGISTRATION(
-													"/welcome-registration.ftl"), ACCOUNT_VERIFICATION(
-															"/account-verification.ftl");
+											"/bid_request_sent.ftl"), AUCTION_CLOSED(
+													"/auction_closed.ftl"), AUCTION_LIVE(
+															"/auction_live.ftl"), AUCTION_PAUSED(
+																	"/auction_paused.ftl"), WELCOME_REGISTRATION(
+																			"/welcome-registration.ftl"), ACCOUNT_VERIFICATION(
+																					"/account-verification.ftl");
 
 	private final String path;
 

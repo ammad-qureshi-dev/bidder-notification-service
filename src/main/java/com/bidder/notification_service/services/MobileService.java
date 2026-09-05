@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class MobileService implements Notifier {
 
 	@Override
-	public SendNotificationResponse send(@Valid SendNotificationRequest request) {
+	public SendNotificationResponse notify(@Valid SendNotificationRequest request) {
 		throw new RuntimeException("Not yet implemented");
 	}
 }

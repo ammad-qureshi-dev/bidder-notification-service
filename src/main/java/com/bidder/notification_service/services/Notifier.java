@@ -7,5 +7,5 @@ import models.dtos.response.SendNotificationResponse;
 
 public interface Notifier {
 
-	SendNotificationResponse send(SendNotificationRequest request);
+	SendNotificationResponse notify(SendNotificationRequest request);
 }

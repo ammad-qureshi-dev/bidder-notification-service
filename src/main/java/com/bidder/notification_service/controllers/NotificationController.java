@@ -21,11 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import response.ApiResponse;
 
-import static com.bidder.notification_service.utils.Constants.Controller.BASE_URI;
-import static com.bidder.notification_service.utils.Constants.Controller.V1;
-
 @RestController
-@RequestMapping(BASE_URI + V1 + "/notification")
+@RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
 public class NotificationController {
 

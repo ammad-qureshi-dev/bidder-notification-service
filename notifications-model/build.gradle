@@ -7,7 +7,8 @@ plugins {
 }
 
 group = 'com.bidder'
-version = '2.1.2'
+version = '2.1.4'
+description = 'adding AUCTION_LIVE and AUCTION_PAUSED'
 
 java {
     toolchain {

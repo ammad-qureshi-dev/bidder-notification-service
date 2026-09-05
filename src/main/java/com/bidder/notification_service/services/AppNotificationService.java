@@ -23,7 +23,7 @@ public class AppNotificationService implements Notifier {
 	private final NotificationRepository notificationRepository;
 
 	@Override
-	public SendNotificationResponse send(@Valid SendNotificationRequest request) {
+	public SendNotificationResponse notify(@Valid SendNotificationRequest request) {
 		var notification = NotificationMapper.requestToEntity(request, ContactType.APP, APP_USER);
 		notificationRepository.save(notification);
 		log.info("App Notification sent to {}", request.recipientId());

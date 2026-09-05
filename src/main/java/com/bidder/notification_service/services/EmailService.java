@@ -41,7 +41,7 @@ public class EmailService implements Notifier {
 	private static final int RETRY_LIMIT = 3;
 
 	@Override
-	public SendNotificationResponse send(SendNotificationRequest request) {
+	public SendNotificationResponse notify(SendNotificationRequest request) {
 		int tries = 0;
 
 		var email = request.recipientConfig().get(ContactType.EMAIL);

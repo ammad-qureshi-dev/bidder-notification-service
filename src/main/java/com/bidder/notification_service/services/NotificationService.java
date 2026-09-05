@@ -44,7 +44,9 @@ public class NotificationService {
 		var config = request.recipientConfig();
 		var appUserId = request.recipientId();
 
+		// todo: Fix
 		if (config == null || config.isEmpty()) {
+
 			config = new HashMap<>();
 
 			var preferredContact = authAndIdentityService.getPreferredContactType(appUserId);
@@ -60,7 +62,7 @@ public class NotificationService {
 					log.error("app-user {} does not have any contact methods set up", appUserId);
 
 					appNotificationService
-							.send(new SendNotificationRequest(appUserId, TemplateName.CONTACT_METHOD_SETUP, null,
+							.notify(new SendNotificationRequest(appUserId, TemplateName.CONTACT_METHOD_SETUP, null,
 									// ToDo: add setup url
 									Map.of("setupUrl", "http://localhost:3000")));
 				} else {
@@ -73,14 +75,14 @@ public class NotificationService {
 
 		for (var contactType : contactTypes) {
 			switch (contactType) {
-				case EMAIL -> sentResponses.add(emailService.send(request));
-				case PHONE -> sentResponses.add(mobileService.send(request));
+				case EMAIL -> sentResponses.add(emailService.notify(request));
+				case PHONE -> sentResponses.add(mobileService.notify(request));
 				case APP -> {
 					/* handled unconditionally below, not per-contact-type */ }
 			}
 		}
 
-		sentResponses.add(appNotificationService.send(request));
+		sentResponses.add(appNotificationService.notify(request));
 
 		return sentResponses;
 	}
