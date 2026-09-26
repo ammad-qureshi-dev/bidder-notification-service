@@ -11,6 +11,7 @@ import models.ContactType;
 import models.NotificationStatus;
 import models.dtos.request.SendNotificationRequest;
 import models.dtos.response.SendNotificationResponse;
+import models.entities.Notification;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -30,10 +31,9 @@ public class AppNotificationService implements Notifier {
 		return new SendNotificationResponse(NotificationStatus.SENT, ContactType.APP, request.recipientId());
 	}
 
-	public void logNotification(@Valid SendNotificationRequest request, ContactType contactType,
-			String recipientContact) {
-		var notification = NotificationMapper.requestToEntity(request, contactType, recipientContact);
+	public void logNotification(Notification notification) {
 		notificationRepository.save(notification);
-		log.info("{} Notification logged for recipient {}", contactType, request.recipientId());
+		log.info("{} Notification logged for recipient {}", notification.getContactType(),
+				notification.getRecipientId());
 	}
 }

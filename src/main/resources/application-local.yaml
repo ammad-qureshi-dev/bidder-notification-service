@@ -13,7 +13,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
@@ -55,9 +55,11 @@ logging:
     root: info
     com.bidder.notification_service: info
 
-bidder-internal-services:
+retry-limit: 3
+
+internal-services:
   identity-and-auth-service: http://localhost:8084
 
 identity-and-auth-service:
-  get-preferred-contact: /api/v1/identity-and-auth/app-user/contacts/preferred-contact-method
-  get-contact-methods: /api/v1/identity-and-auth/app-user/contacts
+  get-preferred-contact: /api/v1/app-user/contacts/preferred-contact-method
+  get-contact-methods: /api/v1/app-user/contacts

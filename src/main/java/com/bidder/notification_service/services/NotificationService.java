@@ -44,45 +44,22 @@ public class NotificationService {
 		var config = request.recipientConfig();
 		var appUserId = request.recipientId();
 
-		// todo: Fix
 		if (config == null || config.isEmpty()) {
-
-			config = new HashMap<>();
-
-			var preferredContact = authAndIdentityService.getPreferredContactType(appUserId);
-
-			if (preferredContact != null) {
-				config.put(preferredContact.getFirst(), preferredContact.getSecond());
-			} else {
-				var allContacts = authAndIdentityService.getContactMethods(appUserId);
-
-				// If for some reason there is NO contact method set up for this user, send an
-				// app notification requesting to set up one
-				if (allContacts == null || allContacts.isEmpty()) {
-					log.error("app-user {} does not have any contact methods set up", appUserId);
-
-					appNotificationService
-							.notify(new SendNotificationRequest(appUserId, TemplateName.CONTACT_METHOD_SETUP, null,
-									// ToDo: add setup url
-									Map.of("setupUrl", "http://localhost:3000")));
-				} else {
-					config = allContacts;
-				}
-			}
+			config = getPreferredContacts(appUserId);
 		}
+
+		// Always send APP notification
+		sentResponses.add(appNotificationService.notify(request));
 
 		var contactTypes = config.keySet();
 
 		for (var contactType : contactTypes) {
-			switch (contactType) {
-				case EMAIL -> sentResponses.add(emailService.notify(request));
-				case PHONE -> sentResponses.add(mobileService.notify(request));
-				case APP -> {
-					/* handled unconditionally below, not per-contact-type */ }
+			if (Objects.requireNonNull(contactType) == ContactType.EMAIL) {
+				sentResponses.add(emailService.notify(request));
+			} else if (contactType == ContactType.PHONE) {
+				sentResponses.add(mobileService.notify(request));
 			}
 		}
-
-		sentResponses.add(appNotificationService.notify(request));
 
 		return sentResponses;
 	}
@@ -111,5 +88,38 @@ public class NotificationService {
 		}
 
 		return n.get();
+	}
+
+	/**
+	 * Gets the app-user's preferred contacts when no recipientConfig is provided to
+	 * send a notification. If no contact is found, it sends an APP-type
+	 * notification to set up contact method(s)
+	 * 
+	 * @param appUserId
+	 *            app user id
+	 * @return map pair of ContactType and it's value
+	 */
+	private Map<ContactType, String> getPreferredContacts(UUID appUserId) {
+		var preferredContact = authAndIdentityService.getPreferredContactType(appUserId);
+
+		if (preferredContact != null) {
+			return Map.of(preferredContact.getFirst(), preferredContact.getSecond());
+		}
+
+		var allContacts = authAndIdentityService.getContactMethods(appUserId);
+
+		if (allContacts != null && !allContacts.isEmpty()) {
+			return allContacts;
+		}
+
+		// If for some reason there is NO contact method set up for this user, send an
+		// app notification requesting to set up one
+		log.error("app-user {} does not have any contact methods set up", appUserId);
+
+		appNotificationService.notify(new SendNotificationRequest(appUserId, TemplateName.CONTACT_METHOD_SETUP, null,
+				// ToDo: add setup url
+				Map.of("setupUrl", "http://localhost:3000")));
+
+		return Collections.emptyMap();
 	}
 }

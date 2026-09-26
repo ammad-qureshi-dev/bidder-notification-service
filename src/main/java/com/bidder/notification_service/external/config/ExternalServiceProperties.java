@@ -2,19 +2,16 @@
 bidder.app */
 package com.bidder.notification_service.external.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Getter
+@EnableConfigurationProperties(IdentityAndAuthServiceEndpoints.class)
 public class ExternalServiceProperties {
 
-	@Bean
-	@ConfigurationProperties(prefix = "bidder-internal-services")
-	public Map<String, String> bidderInternalServices() {
-		return new HashMap<>();
-	}
+	@Value("${internal-services.identity-and-auth-service}")
+	private String identityAndAuthUri;
 }

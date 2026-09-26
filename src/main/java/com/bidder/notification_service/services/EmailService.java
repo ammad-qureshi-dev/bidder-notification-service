@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import com.bidder.notification_service.config.NotificationConfig;
+import com.bidder.notification_service.mappers.NotificationMapper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -32,13 +33,15 @@ public class EmailService implements Notifier {
 	@Value("${MAIL_USERNAME}")
 	private String emailFrom;
 
+	@Value("${retry-limit}")
+	private int retryLimit;
+
 	private final Configuration freeMarkerConfig;
 	private final JavaMailSender emailSender;
 	private final AppNotificationService appNotificationService;
 
 	private static final String EMAIL_TEMPLATE_PREFIX = "email/";
 	private static final String DATA_MODEL_NAME = "data";
-	private static final int RETRY_LIMIT = 3;
 
 	@Override
 	public SendNotificationResponse notify(SendNotificationRequest request) {
@@ -50,20 +53,27 @@ public class EmailService implements Notifier {
 		}
 
 		while (true) {
+			var notification = NotificationMapper.requestToEntity(request, ContactType.EMAIL, email);
+
 			try {
 				tries++;
+
+				// send email to recipient
 				emailSender.send(generateHtmlMessage(request));
 
-				// ToDo: bug -- if logging fails, handle differently
-				appNotificationService.logNotification(request, ContactType.EMAIL, email);
+				// save record to the database
+				notification.setStatus(NotificationStatus.SENT);
+				appNotificationService.logNotification(notification);
 				log.info("Email sent to {}", request.recipientId());
+
 				break;
 			} catch (RuntimeException | IOException | TemplateException | MessagingException e) {
 				log.error("Failed to send email on try #{}. Retrying...", tries, e);
 
-				if (tries >= RETRY_LIMIT) {
+				if (tries >= retryLimit) {
+					notification.setStatus(NotificationStatus.FAILED_TO_SEND);
+					appNotificationService.logNotification(notification);
 					log.error("Failed to send email, retries exceeded", e);
-					throw new RuntimeException();
 				}
 			}
 		}

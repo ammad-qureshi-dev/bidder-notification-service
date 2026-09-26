@@ -2,11 +2,12 @@
 bidder.app */
 package com.bidder.notification_service.external.services;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.bidder.notification_service.external.config.AuthAndIdentityServiceProperties;
-import com.bidder.notification_service.external.config.InternalServiceProperties;
+import com.bidder.notification_service.external.config.ExternalServiceProperties;
+import com.bidder.notification_service.external.config.IdentityAndAuthServiceEndpoints;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
@@ -23,12 +24,12 @@ import response.ApiResponse;
 public class AuthAndIdentityService {
 
 	private final RestClient restClient;
-	private InternalServiceProperties serviceUrls;
-	private AuthAndIdentityServiceProperties props;
+	private final ExternalServiceProperties props;
+	private final IdentityAndAuthServiceEndpoints paths;
 
 	public Pair<ContactType, String> getPreferredContactType(UUID appUserId) {
-		var url = UriComponentsBuilder.fromUriString(serviceUrls.identityAndAuthService() + props.getPreferredContact())
-				.toUriString();
+		var uri = props.getIdentityAndAuthUri();
+		var url = UriComponentsBuilder.fromUriString(uri + paths.getPreferredContact()).toUriString();
 
 		log.info("Calling {}", url);
 		var response = restClient.get().uri(url).header("X-App-User-Id", appUserId.toString()).retrieve()
@@ -44,8 +45,14 @@ public class AuthAndIdentityService {
 	}
 
 	public Map<ContactType, String> getContactMethods(UUID appUserId) {
-		var url = UriComponentsBuilder.fromUriString(serviceUrls.identityAndAuthService() + props.getContactsMethods())
-				.toUriString();
+		if (appUserId == null) {
+			return Map.of(ContactType.APP, "");
+		}
+
+		var uri = props.getIdentityAndAuthUri();
+
+		var url = UriComponentsBuilder.fromUriString(uri).path(paths.getContactMethods())
+				.queryParam("appUserIds", List.of(appUserId)).build().toUriString();
 
 		log.info("Calling {}", url);
 		var response = restClient.get().uri(url).header("X-App-User-Id", appUserId.toString()).retrieve()

@@ -40,12 +40,12 @@ public class NotificationController {
 		}
 	}
 
-	@GetMapping("/recipient/{recipientId}")
+	@GetMapping("/inbox")
 	public ResponseEntity<ApiResponse<List<NotificationResponseDto>>> getNotifications(
 			@RequestParam(value = "contactType", required = false) ContactType contactType,
-			@PathVariable UUID recipientId) {
+			@RequestHeader("X-App-User-Id") UUID appUserId) {
 		return ResponseEntity.ok().body(ApiResponse.<List<NotificationResponseDto>>builder()
-				.data(notificationService.getNotifications(contactType, recipientId)).build());
+				.data(notificationService.getNotifications(contactType, appUserId)).build());
 	}
 
 	@PutMapping("/{notificationId}")
