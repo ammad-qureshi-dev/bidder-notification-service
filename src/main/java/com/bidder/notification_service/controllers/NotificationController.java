@@ -16,7 +16,11 @@ import models.ContactType;
 import models.NotificationStatus;
 import models.dtos.request.SendNotificationRequest;
 import models.dtos.response.NotificationResponseDto;
+import models.dtos.response.PageResponse;
 import models.dtos.response.SendNotificationResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import response.ApiResponse;
@@ -41,11 +45,12 @@ public class NotificationController {
 	}
 
 	@GetMapping("/inbox")
-	public ResponseEntity<ApiResponse<List<NotificationResponseDto>>> getNotifications(
+	public ResponseEntity<ApiResponse<PageResponse<NotificationResponseDto>>> getNotifications(
 			@RequestParam(value = "contactType", required = false) ContactType contactType,
-			@RequestHeader("X-App-User-Id") UUID appUserId) {
-		return ResponseEntity.ok().body(ApiResponse.<List<NotificationResponseDto>>builder()
-				.data(notificationService.getNotifications(contactType, appUserId)).build());
+			@RequestHeader("X-App-User-Id") UUID appUserId,
+			@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		return ResponseEntity.ok().body(ApiResponse.<PageResponse<NotificationResponseDto>>builder()
+				.data(notificationService.getNotifications(contactType, appUserId, pageable)).build());
 	}
 
 	@PutMapping("/{notificationId}")

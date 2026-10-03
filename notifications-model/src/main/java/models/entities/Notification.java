@@ -18,7 +18,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(schema = "notifications_service", name = "notification")
+@Table(schema = "notifications_service", name = "notification", indexes = @Index(name = "idx_notification_inbox", columnList = "recipientId, contactType, createdAt"))
 @EqualsAndHashCode(callSuper = true)
 public class Notification extends BaseEntity {
 

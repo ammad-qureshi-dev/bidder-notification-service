@@ -74,6 +74,7 @@ public class EmailService implements Notifier {
 					notification.setStatus(NotificationStatus.FAILED_TO_SEND);
 					appNotificationService.logNotification(notification);
 					log.error("Failed to send email, retries exceeded", e);
+					break;
 				}
 			}
 		}

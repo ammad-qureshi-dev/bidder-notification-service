@@ -63,3 +63,6 @@ internal-services:
 identity-and-auth-service:
   get-preferred-contact: /api/v1/app-user/contacts/preferred-contact-method
   get-contact-methods: /api/v1/app-user/contacts
+  get-app-user: /api/v1/app-user/{userId}
+
+client-url: http://localhost:3000

@@ -17,11 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
 import models.NotificationStatus;
-import models.TemplateName;
 import models.dtos.request.SendNotificationRequest;
 import models.dtos.response.NotificationResponseDto;
+import models.dtos.response.PageResponse;
 import models.dtos.response.SendNotificationResponse;
 import models.entities.Notification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,7 +34,6 @@ public class NotificationService {
 	private final MobileService mobileService;
 	private final AppNotificationService appNotificationService;
 	private final AuthAndIdentityService authAndIdentityService;
-
 	private final NotificationRepository notificationRepository;
 
 	public List<SendNotificationResponse> send(@Valid SendNotificationRequest request)
@@ -41,37 +41,42 @@ public class NotificationService {
 
 		var sentResponses = new ArrayList<SendNotificationResponse>();
 
-		var config = request.recipientConfig();
+		var recipientConfig = request.recipientConfig();
 		var appUserId = request.recipientId();
 
-		if (config == null || config.isEmpty()) {
-			config = getPreferredContacts(appUserId);
+		prefillAppUserInfo(request);
+
+		if (recipientConfig == null || recipientConfig.isEmpty()) {
+			recipientConfig = getPreferredContacts(appUserId, request);
 		}
 
 		// Always send APP notification
 		sentResponses.add(appNotificationService.notify(request));
 
-		var contactTypes = config.keySet();
+		var contactTypes = recipientConfig.keySet();
 
 		for (var contactType : contactTypes) {
-			if (Objects.requireNonNull(contactType) == ContactType.EMAIL) {
-				sentResponses.add(emailService.notify(request));
-			} else if (contactType == ContactType.PHONE) {
-				sentResponses.add(mobileService.notify(request));
+			try {
+				if (Objects.requireNonNull(contactType) == ContactType.EMAIL) {
+					sentResponses.add(emailService.notify(request));
+				} else if (contactType == ContactType.PHONE) {
+					sentResponses.add(mobileService.notify(request));
+				}
+			} catch (Exception e) {
+				log.error("Error contacting app-user with id = {} for contact-type = {}. Full request: {}", appUserId,
+						contactType, request);
 			}
 		}
 
 		return sentResponses;
 	}
 
-	public List<NotificationResponseDto> getNotifications(ContactType contactType, UUID recipientId) {
-		var notifications = notificationRepository.findByContactTypeAndRecipientId(contactType, recipientId);
+	public PageResponse<NotificationResponseDto> getNotifications(ContactType contactType, UUID recipientId,
+			Pageable pageable) {
+		var notifications = notificationRepository.findByContactTypeAndRecipientId(contactType, recipientId, pageable)
+				.map(NotificationMapper::entityToResponse);
 
-		if (notifications == null || notifications.isEmpty()) {
-			return Collections.emptyList();
-		}
-
-		return notifications.stream().map(NotificationMapper::entityToResponse).toList();
+		return PageResponse.from(notifications);
 	}
 
 	public void updateNotificationStatus(NotificationStatus status, UUID notificationId) {
@@ -99,27 +104,43 @@ public class NotificationService {
 	 *            app user id
 	 * @return map pair of ContactType and it's value
 	 */
-	private Map<ContactType, String> getPreferredContacts(UUID appUserId) {
+	private Map<ContactType, String> getPreferredContacts(UUID appUserId, SendNotificationRequest request) {
 		var preferredContact = authAndIdentityService.getPreferredContactType(appUserId);
 
 		if (preferredContact != null) {
-			return Map.of(preferredContact.getFirst(), preferredContact.getSecond());
+			request.recipientConfig().put(preferredContact.type(), preferredContact.value());
+			return Map.of(preferredContact.type(), preferredContact.value());
 		}
 
 		var allContacts = authAndIdentityService.getContactMethods(appUserId);
 
 		if (allContacts != null && !allContacts.isEmpty()) {
+			request.recipientConfig().putAll(allContacts);
 			return allContacts;
 		}
 
-		// If for some reason there is NO contact method set up for this user, send an
-		// app notification requesting to set up one
 		log.error("app-user {} does not have any contact methods set up", appUserId);
-
-		appNotificationService.notify(new SendNotificationRequest(appUserId, TemplateName.CONTACT_METHOD_SETUP, null,
-				// ToDo: add setup url
-				Map.of("setupUrl", "http://localhost:3000")));
-
 		return Collections.emptyMap();
+	}
+
+	/**
+	 * Retrieves user data like name and fills templateData with the information
+	 * 
+	 * @param request
+	 */
+	private void prefillAppUserInfo(SendNotificationRequest request) {
+		var templateData = request.templateData();
+
+		if (templateData == null || templateData.isEmpty()) {
+			return;
+		}
+
+		var appUser = authAndIdentityService.getAppUser(request.recipientId());
+
+		if (appUser.isEmpty()) {
+			return;
+		}
+
+		templateData.put("fullName", appUser.get().fullName());
 	}
 }
