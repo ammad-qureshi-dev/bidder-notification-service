@@ -10,20 +10,22 @@ import javax.naming.directory.NoSuchAttributeException;
 import com.bidder.notification_service.external.services.AuthAndIdentityService;
 import com.bidder.notification_service.mappers.NotificationMapper;
 import com.bidder.notification_service.repositories.NotificationRepository;
+import dtos.response.AppUserDto;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
 import models.NotificationStatus;
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import models.dtos.response.NotificationResponseDto;
 import models.dtos.response.PageResponse;
 import models.dtos.response.SendNotificationResponse;
 import models.entities.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import static com.bidder.notification_service.utils.Constants.APP_USER;
 
 @Slf4j
 @Service
@@ -36,35 +38,44 @@ public class NotificationService {
 	private final AuthAndIdentityService authAndIdentityService;
 	private final NotificationRepository notificationRepository;
 
-	public List<SendNotificationResponse> send(@Valid SendNotificationRequest request)
+	public List<SendNotificationResponse> send(NotifyRequest request)
 			throws NoSuchAttributeException, TemplateException, MessagingException, IOException {
 
 		var sentResponses = new ArrayList<SendNotificationResponse>();
-
-		var recipientConfig = request.recipientConfig();
 		var appUserId = request.recipientId();
 
-		prefillAppUserInfo(request);
+		var appUser = authAndIdentityService.getAppUser(appUserId);
 
-		if (recipientConfig == null || recipientConfig.isEmpty()) {
-			recipientConfig = getPreferredContacts(appUserId, request);
+		if (appUser.isEmpty()) {
+			log.error("No user found with app-user-id = {}", appUserId);
+		}
+
+		prefillAppUserInfo(appUser.get(), request);
+
+		Map<ContactType, String> preferredContacts;
+
+		if (request.recipientConfig() != null && !request.recipientConfig().isEmpty()) {
+			preferredContacts = request.recipientConfig();
+		} else {
+			preferredContacts = getPreferredContacts(appUser.get());
 		}
 
 		// Always send APP notification
-		sentResponses.add(appNotificationService.notify(request));
+		sentResponses.add(appNotificationService.notify(request, APP_USER));
 
-		var contactTypes = recipientConfig.keySet();
+		for (var entry : preferredContacts.entrySet()) {
+			var type = entry.getKey();
+			var value = entry.getValue();
 
-		for (var contactType : contactTypes) {
 			try {
-				if (Objects.requireNonNull(contactType) == ContactType.EMAIL) {
-					sentResponses.add(emailService.notify(request));
-				} else if (contactType == ContactType.PHONE) {
-					sentResponses.add(mobileService.notify(request));
+				if (type == ContactType.EMAIL) {
+					sentResponses.add(emailService.notify(request, value));
+				} else if (type == ContactType.PHONE) {
+					sentResponses.add(mobileService.notify(request, value));
 				}
 			} catch (Exception e) {
 				log.error("Error contacting app-user with id = {} for contact-type = {}. Full request: {}", appUserId,
-						contactType, request);
+						type, request);
 			}
 		}
 
@@ -100,26 +111,30 @@ public class NotificationService {
 	 * send a notification. If no contact is found, it sends an APP-type
 	 * notification to set up contact method(s)
 	 * 
-	 * @param appUserId
-	 *            app user id
+	 * @param appUser
+	 *            app user DTO
 	 * @return map pair of ContactType and it's value
 	 */
-	private Map<ContactType, String> getPreferredContacts(UUID appUserId, SendNotificationRequest request) {
-		var preferredContact = authAndIdentityService.getPreferredContactType(appUserId);
+	private Map<ContactType, String> getPreferredContacts(AppUserDto appUser) {
+		var preferredContact = appUser.contact();
 
+		// ToDo: break down this if-statement
 		if (preferredContact != null) {
-			request.recipientConfig().put(preferredContact.type(), preferredContact.value());
-			return Map.of(preferredContact.type(), preferredContact.value());
+			if (preferredContact.type() != null && preferredContact.value() != null) {
+				var validContactTypes = Set.of(ContactType.PHONE, ContactType.EMAIL);
+				if (validContactTypes.contains(preferredContact.type())) {
+					return Map.of(preferredContact.type(), preferredContact.value());
+				}
+			}
 		}
 
-		var allContacts = authAndIdentityService.getContactMethods(appUserId);
+		var allContacts = authAndIdentityService.getContactMethods(appUser.id());
 
 		if (allContacts != null && !allContacts.isEmpty()) {
-			request.recipientConfig().putAll(allContacts);
 			return allContacts;
 		}
 
-		log.error("app-user {} does not have any contact methods set up", appUserId);
+		log.error("App-user with this id = {} does not have any contact methods set up", appUser.id());
 		return Collections.emptyMap();
 	}
 
@@ -128,19 +143,13 @@ public class NotificationService {
 	 * 
 	 * @param request
 	 */
-	private void prefillAppUserInfo(SendNotificationRequest request) {
+	private void prefillAppUserInfo(AppUserDto appUser, NotifyRequest request) {
 		var templateData = request.templateData();
 
-		if (templateData == null || templateData.isEmpty()) {
+		if (templateData == null || templateData.isEmpty() || appUser == null) {
 			return;
 		}
 
-		var appUser = authAndIdentityService.getAppUser(request.recipientId());
-
-		if (appUser.isEmpty()) {
-			return;
-		}
-
-		templateData.put("fullName", appUser.get().fullName());
+		templateData.put("fullName", appUser.fullName());
 	}
 }

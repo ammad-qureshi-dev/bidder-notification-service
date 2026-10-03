@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import models.ContactType;
 import models.TemplateName;
 
-public record SendNotificationRequest(
+public record NotifyRequest(
 		// AppUserId
 		@NotNull UUID recipientId,
 

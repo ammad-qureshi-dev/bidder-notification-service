@@ -19,4 +19,6 @@ public class Constants {
 	}
 
 	public static final String NOTIFICATION_TOPIC = "notification";
+	public static final String APP_USER = "app-user";
+
 }

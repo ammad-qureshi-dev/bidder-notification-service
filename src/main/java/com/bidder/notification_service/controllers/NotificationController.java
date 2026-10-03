@@ -14,7 +14,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import models.ContactType;
 import models.NotificationStatus;
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import models.dtos.response.NotificationResponseDto;
 import models.dtos.response.PageResponse;
 import models.dtos.response.SendNotificationResponse;
@@ -34,7 +34,7 @@ public class NotificationController {
 
 	@PostMapping("/send")
 	public ResponseEntity<ApiResponse<List<SendNotificationResponse>>> sendNotification(
-			@RequestBody SendNotificationRequest request) {
+			@RequestBody NotifyRequest request) {
 		try {
 			var response = notificationService.send(request);
 			return ResponseEntity.ok()

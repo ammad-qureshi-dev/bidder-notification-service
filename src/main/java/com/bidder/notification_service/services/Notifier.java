@@ -2,10 +2,10 @@
 bidder.app */
 package com.bidder.notification_service.services;
 
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import models.dtos.response.SendNotificationResponse;
 
 public interface Notifier {
 
-	SendNotificationResponse notify(SendNotificationRequest request);
+	SendNotificationResponse notify(NotifyRequest request, String value);
 }

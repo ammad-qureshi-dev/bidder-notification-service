@@ -5,7 +5,7 @@ package com.bidder.notification_service.listeners;
 import com.bidder.notification_service.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class NotificationEventListener {
 	private final NotificationService notificationService;
 
 	@KafkaListener(topics = NOTIFICATION_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
-	public void onNotificationEvent(SendNotificationRequest request) {
+	public void onNotificationEvent(NotifyRequest request) {
 		try {
 			log.info("consuming request");
 			notificationService.send(request);

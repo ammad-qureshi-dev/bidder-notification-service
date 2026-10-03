@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
 import models.NotificationStatus;
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import models.dtos.response.SendNotificationResponse;
 import models.entities.Notification;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AppNotificationService implements Notifier {
 
-	private static final String APP_USER = "app-user";
-
 	private final NotificationRepository notificationRepository;
 
 	@Override
-	public SendNotificationResponse notify(@Valid SendNotificationRequest request) {
-		var notification = NotificationMapper.requestToEntity(request, ContactType.APP, APP_USER);
+	public SendNotificationResponse notify(@Valid NotifyRequest request, String value) {
+		var notification = NotificationMapper.requestToEntity(request, ContactType.APP, value);
 		notificationRepository.save(notification);
 		log.info("App Notification sent to {}", request.recipientId());
 		return new SendNotificationResponse(NotificationStatus.SENT, ContactType.APP, request.recipientId());

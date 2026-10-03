@@ -85,7 +85,7 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
 	implementation 'com.bidder:common-model:0.0.3-SNAPSHOT'
-	implementation 'com.bidder:identity-auth-service:0.0.5'
+	implementation 'com.bidder:identity-auth-service:0.0.6'
 }
 
 tasks.named('test') {

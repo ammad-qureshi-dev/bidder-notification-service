@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
 import models.NotificationStatus;
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import models.dtos.response.SendNotificationResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,10 +44,9 @@ public class EmailService implements Notifier {
 	private static final String DATA_MODEL_NAME = "data";
 
 	@Override
-	public SendNotificationResponse notify(SendNotificationRequest request) {
+	public SendNotificationResponse notify(NotifyRequest request, String email) {
 		int tries = 0;
 
-		var email = request.recipientConfig().get(ContactType.EMAIL);
 		if (!StringUtils.hasLength(email)) {
 			throw new IllegalStateException("Email cannot be sent, no email provided");
 		}
@@ -59,7 +58,7 @@ public class EmailService implements Notifier {
 				tries++;
 
 				// send email to recipient
-				emailSender.send(generateHtmlMessage(request));
+				emailSender.send(generateHtmlMessage(email, request));
 
 				// save record to the database
 				notification.setStatus(NotificationStatus.SENT);
@@ -82,7 +81,7 @@ public class EmailService implements Notifier {
 		return new SendNotificationResponse(NotificationStatus.SENT, ContactType.EMAIL, request.recipientId());
 	}
 
-	private MimeMessage generateHtmlMessage(SendNotificationRequest request)
+	private MimeMessage generateHtmlMessage(String email, NotifyRequest request)
 			throws IOException, TemplateException, MessagingException {
 		Template template = freeMarkerConfig.getTemplate(EMAIL_TEMPLATE_PREFIX + request.template().getPath());
 		log.debug("Template {} found", request.template());
@@ -93,9 +92,9 @@ public class EmailService implements Notifier {
 
 		MimeMessage mimeMessage = emailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
-		helper.setTo(request.recipientConfig().get(ContactType.EMAIL));
+		helper.setTo(email);
 		helper.setSubject(NotificationConfig.getConfiguredSubject(request.template()).getSubject());
-		helper.setText(writer.toString(), request.recipientConfig().containsKey(ContactType.EMAIL));
+		helper.setText(writer.toString(), true);
 		helper.setFrom(emailFrom);
 
 		return mimeMessage;

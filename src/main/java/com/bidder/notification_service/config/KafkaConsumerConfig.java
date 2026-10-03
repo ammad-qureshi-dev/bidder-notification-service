@@ -5,7 +5,7 @@ package com.bidder.notification_service.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import models.dtos.request.SendNotificationRequest;
+import models.dtos.request.NotifyRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 public class KafkaConsumerConfig {
 
 	@Bean
-	public ConsumerFactory<String, SendNotificationRequest> consumerFactory(
+	public ConsumerFactory<String, NotifyRequest> consumerFactory(
 			@Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
 			@Value("${spring.kafka.consumer.group-id}") String groupId) {
 		Map<String, Object> configProps = new HashMap<>();
@@ -32,7 +32,7 @@ public class KafkaConsumerConfig {
 		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
 		configProps.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JacksonJsonDeserializer.class);
-		configProps.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, SendNotificationRequest.class.getName());
+		configProps.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, NotifyRequest.class.getName());
 		configProps.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "models.dtos.request");
 		configProps.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 		configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -40,9 +40,9 @@ public class KafkaConsumerConfig {
 	}
 
 	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, SendNotificationRequest> kafkaListenerContainerFactory(
-			ConsumerFactory<String, SendNotificationRequest> consumerFactory) {
-		ConcurrentKafkaListenerContainerFactory<String, SendNotificationRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
+	public ConcurrentKafkaListenerContainerFactory<String, NotifyRequest> kafkaListenerContainerFactory(
+			ConsumerFactory<String, NotifyRequest> consumerFactory) {
+		ConcurrentKafkaListenerContainerFactory<String, NotifyRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		return factory;
 	}

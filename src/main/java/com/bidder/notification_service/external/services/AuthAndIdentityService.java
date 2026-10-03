@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.ContactType;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,23 +25,6 @@ public class AuthAndIdentityService {
 	private final RestClient restClient;
 	private final ExternalServiceProperties props;
 	private final IdentityAndAuthServiceEndpoints paths;
-
-	public PreferredContactMethod getPreferredContactType(UUID appUserId) {
-		var uri = props.getIdentityAndAuthUri();
-		var url = UriComponentsBuilder.fromUriString(uri + paths.getPreferredContact()).toUriString();
-
-		log.info("Calling {}", url);
-		var response = restClient.get().uri(url).header("X-App-User-Id", appUserId.toString()).retrieve()
-				.body(new ParameterizedTypeReference<ApiResponse<PreferredContactMethod>>() {
-				});
-
-		if (response == null) {
-			log.error("Response was null for request {}", url);
-			throw new RuntimeException("No response received from catalog-service. Item not found. Please check logs");
-		}
-
-		return response.getData();
-	}
 
 	public Map<ContactType, String> getContactMethods(UUID appUserId) {
 		if (appUserId == null) {
@@ -61,7 +43,7 @@ public class AuthAndIdentityService {
 
 		if (response == null) {
 			log.error("Response was null for request {}", url);
-			throw new RuntimeException("No response received from catalog-service. Item not found. Please check logs");
+			return Map.of(ContactType.APP, "");
 		}
 
 		return response.getData();
@@ -83,8 +65,7 @@ public class AuthAndIdentityService {
 
 		if (response == null) {
 			log.error("Response was null for request {}", url);
-			throw new NoSuchElementException(
-					"No response received from auth-and-identity-service. AppUser not found. Please check logs");
+			return Optional.empty();
 		}
 
 		return Optional.of(response.getData());
