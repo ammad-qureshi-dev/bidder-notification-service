@@ -25,7 +25,8 @@
                         </p>
                         <p style="margin:0 0 24px 0; font-size:16px; color:#4b5563; line-height:1.6;">
                             Thanks for signing up for <strong>Bidder</strong>. Please verify your email address
-                            to activate your account and start bidding.
+                            to activate your account and start bidding. Your account will expire within 31 days of
+                            registering if not verified.
                         </p>
                     </td>
                 </tr>
