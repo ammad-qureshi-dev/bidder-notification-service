@@ -40,7 +40,8 @@ public class EmailService implements Notifier {
 	private final JavaMailSender emailSender;
 	private final AppNotificationService appNotificationService;
 
-	private static final String EMAIL_TEMPLATE_PREFIX = "email/";
+	// TemplateName paths already start with "/"
+	private static final String EMAIL_TEMPLATE_PREFIX = "email";
 	private static final String DATA_MODEL_NAME = "data";
 
 	@Override
