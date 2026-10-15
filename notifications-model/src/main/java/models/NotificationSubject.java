@@ -17,7 +17,8 @@ public enum NotificationSubject {
 																	"Your auction has closed"), AUCTION_LIVE(
 																			"Your auction is now live"), AUCTION_PAUSED(
 																					"Your auction has been paused"), LEADING_BID(
-																							"You now have the leading bid");
+																							"You now have the leading bid"), EXPIRED_BID(
+																									"Your bid has expired");
 
 	private final String subject;
 

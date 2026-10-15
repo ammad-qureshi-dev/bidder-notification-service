@@ -36,6 +36,7 @@ public class NotificationConfig {
 					Map.entry(TemplateName.AUCTION_LIVE, Pair.of(SUCCESS, AUCTION_LIVE)),
 					Map.entry(TemplateName.AUCTION_PAUSED, Pair.of(WARNING, AUCTION_PAUSED)),
 					Map.entry(TemplateName.LEADING_BID, Pair.of(SUCCESS, LEADING_BID)),
+					Map.entry(TemplateName.EXPIRED_BID, Pair.of(WARNING, EXPIRED_BID)),
 					Map.entry(TemplateName.CONTACT_METHOD_SETUP, Pair.of(ACTION_REQUIRED, SETUP_CONTACT_METHOD)));
 
 	public static NotificationType getConfiguredType(TemplateName templateName) {

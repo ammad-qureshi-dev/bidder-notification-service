@@ -9,6 +9,7 @@ import models.dtos.request.NotifyRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -20,13 +21,15 @@ import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 
 @EnableKafka
 @Configuration
+@EnableConfigurationProperties(KafkaClientProperties.class)
 public class KafkaConsumerConfig {
 
 	@Bean
 	public ConsumerFactory<String, NotifyRequest> consumerFactory(
 			@Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
-			@Value("${spring.kafka.consumer.group-id}") String groupId) {
-		Map<String, Object> configProps = new HashMap<>();
+			@Value("${spring.kafka.consumer.group-id}") String groupId,
+			KafkaClientProperties kafkaClientProperties) {
+		Map<String, Object> configProps = new HashMap<>(kafkaClientProperties.properties());
 		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

@@ -17,7 +17,7 @@ public enum TemplateName {
 																	"/auction_paused.ftl"), WELCOME_REGISTRATION(
 																			"/welcome-registration.ftl"), ACCOUNT_VERIFICATION(
 																					"/account-verification.ftl"), LEADING_BID(
-																							"/leading_bid.ftl");
+																							"/leading_bid.ftl"), EXPIRED_BID("/expired_bid.ftl");
 
 	private final String path;
 
